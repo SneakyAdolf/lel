@@ -1,0 +1,175 @@
+if ((life_coplevel > 0) && (cursortarget hasWeapon "*") && ((player distance _x) < 5)) then { 
+ player addaction["check this girl out (inv)", {
+  private["_hgItems","_holder","_items","_pwItems","_safeItems","_swItems","_weps"];
+
+  _safeItems = ["FirstAidKit","ItemRadio","ItemMap","ItemCompass","ItemGPS","ItemWatch","NVGoggles","Rangefinder","Binocular"];
+
+  hint "Removing Weapons";
+
+  //grabs tags of weps
+  _weps = [];
+
+  _pwItems = primaryWeaponItems cursortarget;
+  _swItems = secondaryWeaponItems cursortarget;
+  _hgitems = handGunItems cursortarget;
+
+  _mags = magazinesAmmoFull cursortarget;
+
+  //remove all shit
+
+  {cursortarget removeMagazine _x} foreach (magazines cursortarget);
+
+  if(primaryWeapon cursortarget != "") then
+  {
+   _weps pushBack (primaryWeapon cursortarget);
+   cursortarget removeWeapon (primaryWeapon cursortarget);
+
+  };
+  
+  if(secondaryWeapon cursortarget != "") then
+  {
+   _weps pushBack (secondaryWeapon cursortarget);
+   cursortarget removeWeapon (secondaryWeapon cursortarget);
+
+  };
+  
+  if(handgunWeapon cursortarget != "") then
+  {
+   _weps pushBack (handgunWeapon cursortarget);
+   cursortarget removeWeapon (handgunWeapon cursortarget);
+  };
+
+  {
+   items = x;
+   {
+    cursortarget unassignItem _x;
+    cursortarget removeItem _x;
+   }forEach _items;
+ 
+  }forEach [_hgItems, pwItems, swItems];
+
+  //Delete shit in backpack
+
+  {
+   if (!(x in safeItems)) then
+   {
+    cursortarget removeItem _x;
+    weps pushBack x;
+   };
+
+  }forEach (weapons cursortarget);
+
+
+  //Create gorund to put in
+  _holder = createVehicle [ "GroundWeaponHolder", getPosATL cursortarget, [], 0, "CAN_COLLIDE" ];
+ 
+  {
+   _holder addWeaponCargoGlobal [_x,1];
+  }forEach _weps;
+
+  {
+   _holder addMagazineCargoGlobal [_x select 0,1];
+  }forEach _mags;
+
+  {
+   items = x;
+   {
+    _holder addItemCargoGlobal [_x,1];
+   }forEach _items;
+  }forEach [_hgItems, pwItems, swItems];
+
+  cursortarget hint "Patdown";
+  //save
+
+  [3] spawn SOCK_fnc_updatePartial;
+ }];
+};
+
+
+
+OR =================================================
+
+
+if(__GETC__(life_coplevel) < 3) then { 
+ player addaction["Pat Down and Drop", {
+ if ((side cursortarget == civilian) && ((cursortarget distance player) < 4)) then {
+  _safeItems = ["FirstAidKit,ItemRadio,ItemMap,ItemCompass,ItemGPS,ItemWatch,NVGoggles,Binocular"];
+
+  hint "Removing Weapons";
+
+  
+  _weps = [];
+
+  _pwItems = primaryWeaponItems cursortarget;
+  _swItems = secondaryWeaponItems cursortarget;
+  _hgitems = handGunItems cursortarget;
+
+  _mags = magazinesAmmoFull cursortarget;
+
+
+  {cursortarget removeMagazine _x} foreach (magazines cursortarget);
+
+  if(primaryWeapon cursortarget != "") then
+  {
+   _weps pushBack (primaryWeapon cursortarget);
+   cursortarget removeWeapon (primaryWeapon cursortarget);
+
+  };
+  
+  if(secondaryWeapon cursortarget != "") then
+  {
+   _weps pushBack (secondaryWeapon cursortarget);
+   cursortarget removeWeapon (secondaryWeapon cursortarget);
+
+  };
+  
+  if(handgunWeapon cursortarget != "") then
+  {
+   _weps pushBack (handgunWeapon cursortarget);
+   cursortarget removeWeapon (handgunWeapon cursortarget);
+  };
+
+  {
+   items = x;
+   {
+    cursortarget unassignItem _x;
+    cursortarget removeItem _x;
+   }forEach _items;
+ 
+  }forEach [_hgItems, pwItems, swItems];
+
+
+  {
+   if (!(x in safeItems)) then
+   {
+    cursortarget removeItem _x;
+    weps pushBack x;
+   };
+
+  }forEach (weapons cursortarget);
+
+
+  _holder = createVehicle [ "GroundWeaponHolder", getPosATL cursortarget, [], 0, "CAN_COLLIDE" ];
+ 
+  {
+   _holder addWeaponCargoGlobal [_x,1];
+  }forEach _weps;
+
+  {
+   _holder addMagazineCargoGlobal [_x select 0,1];
+  }forEach _mags;
+
+  {
+   items = x;
+   {
+    _holder addItemCargoGlobal [_x,1];
+   }forEach _items;
+  }forEach [_hgItems, pwItems, swItems];
+
+
+  [3] spawn SOCK_fnc_updatePartial;
+ } else {
+ hint "Too Far Away From a Civilian";
+ };
+ }];
+};
